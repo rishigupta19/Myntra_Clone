@@ -14,20 +14,42 @@ const FetchItems = () => {
     const signal = controller.signal;
 
     dispatch(fetchStatusActions.markFetchingStarted());
-    fetch("http://localhost:8080/items", { signal })
-      .then((res) => res.json())
-      .then(({ items }) => {
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch("https://myntrabackend.vercel.app/items", { signal });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        dispatch(itemsActions.addInitialItems(data.items));
         dispatch(fetchStatusActions.markFetchDone());
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Fetch error:", err.message);
+          dispatch(fetchStatusActions.markFetchFailed(err.message));
+        }
+      } finally {
         dispatch(fetchStatusActions.markFetchingFinished());
-        dispatch(itemsActions.addInitialItems(items[0]));
-      });
+      }
+    };
+
+    fetchData();
 
     return () => {
       controller.abort();
     };
-  }, [fetchStatus]);
+  }, [fetchStatus.fetchDone, dispatch]);
 
-  return <></>;
+  if (fetchStatus.isFetching) {
+    return <p>Loading items...</p>;
+  }
+
+  if (fetchStatus.error) {
+    return <p>Error: {fetchStatus.error}</p>;
+  }
+
+  return null;
 };
 
 export default FetchItems;

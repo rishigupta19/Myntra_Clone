@@ -8,7 +8,7 @@ async function getStoredItems() {
 }
 
 function storeItems(items) {
-  return fs.writeFile('items.json', JSON.stringify({ items: items || [] }));
+  return fs.writeFile('./items.json', JSON.stringify({ items: items || [] }));
 }
 
 exports.getStoredItems = getStoredItems;

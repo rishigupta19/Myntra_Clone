@@ -17,7 +17,7 @@ const FetchItems = () => {
 
     const fetchData = async () => {
       try {
-        const response = await fetch("https://myntrabackend.vercel.app/items", { signal });
+        const response = await fetch("https://myntrabackend.vercel.app", { signal });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
